@@ -11,3 +11,5 @@
 .gitignore
 .clang-format
 node_modules
+# Ignore secrets file
+secrets.h
