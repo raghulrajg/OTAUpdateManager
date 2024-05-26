@@ -1,2 +1,2 @@
 # miniProject
-Implementation of OTA for remote monitoring and control in  IoT device
+Implementation of OTA for remote monitoring and control the IoT device
