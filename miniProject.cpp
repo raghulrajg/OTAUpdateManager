@@ -7,7 +7,6 @@ miniProject *instance = new miniProject;
 
 void update_started()
 {
-  // miniProject *instance = new miniProject;
 #ifdef WM_DEBUG_LEVEL
   instance->DEBUG_WM(F("CALLBACK:  HTTP update process started"));
 #endif
@@ -15,7 +14,6 @@ void update_started()
 
 void update_finished()
 {
-  // miniProject *instance = new miniProject;
 #ifdef WM_DEBUG_LEVEL
   instance->DEBUG_WM(F("CALLBACK:  HTTP update process finished"));
 #endif
@@ -24,7 +22,6 @@ void update_finished()
 
 void update_progress(int Cur, int Total)
 {
-  // miniProject *instance = new miniProject;
   digitalWrite(2, HIGH);
 #ifdef WM_DEBUG_LEVEL
   instance->DEBUG_WM(F("CALLBACK:  HTTP update process and bytes"), String(Cur) + " " + String(Total));
@@ -34,7 +31,6 @@ void update_progress(int Cur, int Total)
 
 void update_error(int err)
 {
-  // miniProject *instance = new miniProject;
 #ifdef WM_DEBUG_LEVEL
   instance->DEBUG_WM(F("CALLBACK:  HTTP update fatal error code "), err);
 #endif
@@ -42,7 +38,6 @@ void update_error(int err)
 
 void callback(char *topic, byte *payload, unsigned int length)
 {
-  // miniProject *instance = new miniProject;
   char msg[length + 1];
   memcpy(msg, payload, length);
   msg[length] = '\0';
@@ -114,7 +109,6 @@ void miniProject::wifimanagerConn(char const *apName, char const *apPassword, mi
 void miniProject::OTAUpdate()
 {
   WiFiClient client1;
-  // miniProject *instance = new miniProject;
 
   miniProject::mqtt();
 
