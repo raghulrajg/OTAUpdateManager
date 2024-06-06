@@ -1,3 +1,14 @@
+/**
+ * OTAUpdateManager.cpp
+ * 
+ * OTAUpdateManager, a library for the ESP8266/Arduino platform
+ * for managing Over-The-Air updates for IoT devices
+ * 
+ * @author Creator Raghul Raj G
+ * @version 1.0-gr2.1
+ * @license GNU v3.0
+ */
+
 #include "OTAUpdateManager.h"
 
 WiFiClient client;
