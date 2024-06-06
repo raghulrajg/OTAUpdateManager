@@ -59,7 +59,6 @@ private:
 	static String host;
 	static int _StatusCode;
 
-	// mqtt variable
 	Client *_client;
 	uint8_t *buffer;
 	uint8_t *custom_buffer;
@@ -82,7 +81,7 @@ private:
 	int _state;
 
 	// functions
-	static void loop2(void *pvParameters);
+	static void loop(void *pvParameters);
 	static void OTAUpdate();
 
 public:
@@ -96,10 +95,9 @@ public:
 
 	static void wifimanagerConn(char const *apName, char const *apPassword, miniProject *instance);
 	void deviceId(void);
-	void mqtt(int cur, int total);
+	void Alive(int cur, int total);
 	friend void callback(char *topic, byte *payload, unsigned int length);
 
-	// mqtt
 	void connection(Client &client);
 	miniProject &setServer(const char *domain, uint16_t port);
 	miniProject &setClient(Client &client);

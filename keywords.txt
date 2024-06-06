@@ -11,9 +11,29 @@ miniProject	KEYWORD1
 #######################################
 # Methods and Functions (KEYWORD2)
 #######################################
-wifimanagerConn	KEYWORD2
-deviceId	KEYWORD2
-
+wifimanagerConn	    KEYWORD2
+banner              KEYWORD2
+OTAUpdate           KEYWORD2
+update_started      KEYWORD2
+update_finished     KEYWORD2
+update_error        KEYWORD2
+update_progress     KEYWORD2
+Alive               KEYWORD2
+callback            KEYWORD2
+deviceId            KEYWORD2
+connection          KEYWORD2
+connect 	        KEYWORD2
+publish 	        KEYWORD2
+write	 	        KEYWORD2
+subscribe 	        KEYWORD2
+loop 	            KEYWORD2
+connected 	        KEYWORD2
+setServer	        KEYWORD2
+setClient	        KEYWORD2
+setStream	        KEYWORD2
+setKeepAlive 	    KEYWORD2
+setBufferSize 	    KEYWORD2
+setSocketTimeout 	KEYWORD2
 #######################################
 # Constants (LITERAL1)
 #######################################

@@ -25,7 +25,7 @@ void update_progress(int Cur, int Total)
 #ifdef WM_DEBUG_LEVEL
   instance->DEBUG_WM(F("CALLBACK:  HTTP update process and bytes"), String(Cur) + " " + String(Total));
 #endif
-  instance->mqtt(Cur, Total);
+  instance->Alive(Cur, Total);
 }
 
 void update_error(int err)
@@ -52,7 +52,7 @@ void callback(char *topic, byte *payload, unsigned int length)
   miniProject::_StatusCode = doc["status"];
 }
 
-void miniProject::mqtt(int cur = 0, int total = 0)
+void miniProject::Alive(int cur = 0, int total = 0)
 {
   StaticJsonDocument<256> doc;
   doc["deviceID"] = String(uniqueId);
@@ -100,7 +100,7 @@ void miniProject::OTAUpdate()
 {
   WiFiClient client1;
 
-  instance->mqtt();
+  instance->Alive();
 
   if (_StatusCode == Update)
   {
@@ -701,7 +701,7 @@ miniProject::miniProject(const String &user, const String &token, const int Stat
   instance->subscribe(topic.c_str());
 
   xTaskCreateUniversal(
-      loop2,
+      miniProject::loop,
       "loop2",
       8000,
       NULL,
@@ -725,7 +725,7 @@ const String miniProject::mqtt_server = "serveo.net";
 const int miniProject::mqtt_port = 2512;
 int miniProject::_StatusCode = 0;
 
-void miniProject::loop2(void *pvParameters)
+void miniProject::loop(void *pvParameters)
 {
   while (1)
   {
