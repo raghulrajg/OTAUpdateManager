@@ -50,7 +50,7 @@ Implementation of OTA for remote monitoring and control of IoT devices
 - Upload new code to the ESP board through the update section.
 
 ## How It Looks
-![ESP8266 WiFi Captive Portal Homepage](https://i.imgur.com/3LIUSZR.png) ![ESP8266 WiFi Captive Portal Homepage](https://i.imgur.com/sccSpXp.png) ![ESP8266 WiFi Captive Portal Homepage](https://i.imgur.com/NzAXmK6.png)
+![Homepage](https://i.imgur.com/3LIUSZR.png) ![user dashboard](https://i.imgur.com/sccSpXp.png) ![program editor](https://i.imgur.com/NzAXmK6.png)
 
 ## Quick Start
 
