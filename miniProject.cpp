@@ -1,8 +1,6 @@
 #include "miniProject.h"
 
 WiFiClient client;
-WiFiClient httpclient;
-HTTPClient http;
 miniProject *instance = new miniProject;
 static TaskHandle_t _arduino_event_task_handle = NULL;
 
@@ -52,13 +50,10 @@ void callback(char *topic, byte *payload, unsigned int length)
 #endif
   }
   miniProject::_StatusCode = doc["status"];
-  //	Serial.print("inside the callback: ");
-  //	Serial.println(miniProject::_StatusCode);
 }
 
 void miniProject::mqtt(int cur = 0, int total = 0)
 {
-  // miniProject instance2;
   StaticJsonDocument<256> doc;
   doc["deviceID"] = String(uniqueId);
   doc["tot"] = total;
@@ -70,25 +65,18 @@ void miniProject::mqtt(int cur = 0, int total = 0)
   String topic = "state/" + _User;
   if (instance->publish(topic.c_str(), out))
   {
-    // Serial.print("message is send! ");
-    // Serial.println(out);
     digitalWrite(2, LOW);
   }
   else
   {
     ESP.restart();
   }
-
-  //  String UpdateTopic = "readytoupdate/"+_User+"/"+_Token;
-  //  miniProject.subscribe(UpdateTopic.c_str());
-
   instance->loop();
 }
 
 void miniProject::wifimanagerConn(char const *apName, char const *apPassword, miniProject *instance)
 {
   WiFiManager wm;
-  // Serial.begin(115200);
   bool res;
   res = wm.autoConnect(apName, apPassword);
   if (!res)
@@ -175,12 +163,7 @@ void miniProject::connection(Client &client)
   setSocketTimeout(MQTT_SOCKET_TIMEOUT);
 }
 
-boolean miniProject::connect(const char *id, const char *user, const char *pass)
-{
-  return connect(id, user, pass, 0, 0, 0, 0, 1);
-}
-
-boolean miniProject::connect(const char *id, const char *user, const char *pass, const char *willTopic, uint8_t willQos, boolean willRetain, const char *willMessage, boolean cleanSession)
+boolean miniProject::connect(const char *id)
 {
   if (!connected())
   {
@@ -196,81 +179,16 @@ boolean miniProject::connect(const char *id, const char *user, const char *pass,
       {
         result = _client->connect(this->domain, this->port);
       }
-      else
-      {
-        result = _client->connect(this->ip, this->port);
-      }
     }
 
     if (result == 1)
     {
       nextMsgId = 1;
-      // Leave room in the buffer for header and variable length field
-      uint16_t length = MQTT_MAX_HEADER_SIZE;
-      unsigned int j;
 
-#if MQTT_VERSION == MQTT_VERSION_3_1
-      uint8_t d[9] = {0x00, 0x06, 'M', 'Q', 'I', 's', 'd', 'p', MQTT_VERSION};
-#define MQTT_HEADER_VERSION_LENGTH 9
-#elif MQTT_VERSION == MQTT_VERSION_3_1_1
-      uint8_t d[7] = {0x00, 0x04, 'M', 'Q', 'T', 'T', MQTT_VERSION};
-#define MQTT_HEADER_VERSION_LENGTH 7
-#endif
-      for (j = 0; j < MQTT_HEADER_VERSION_LENGTH; j++)
-      {
-        this->buffer[length++] = d[j];
-      }
+      uint8_t values[] = {126, 158, 114, 16, 55, 0, 4, 77, 81, 84, 84, 4, 194, 0, 15, 0, 20, 66, 48, 51, 56, 51, 68, 67, 52, 70, 53, 70, 67, 70, 67, 70, 53, 67, 52, 51, 68, 0, 10, 114, 97, 103, 104, 117, 108, 114, 97, 106, 103, 0, 9, 71, 114, 50, 95, 110, 101, 109, 97, 109};
+      custom_buffer = values;
 
-      uint8_t v;
-      if (willTopic)
-      {
-        v = 0x04 | (willQos << 3) | (willRetain << 5);
-      }
-      else
-      {
-        v = 0x00;
-      }
-      if (cleanSession)
-      {
-        v = v | 0x02;
-      }
-
-      if (user != NULL)
-      {
-        v = v | 0x80;
-
-        if (pass != NULL)
-        {
-          v = v | (0x80 >> 1);
-        }
-      }
-      this->buffer[length++] = v;
-
-      this->buffer[length++] = ((this->keepAlive) >> 8);
-      this->buffer[length++] = ((this->keepAlive) & 0xFF);
-
-      CHECK_STRING_LENGTH(length, id)
-      length = writeString(id, this->buffer, length);
-      if (willTopic)
-      {
-        CHECK_STRING_LENGTH(length, willTopic)
-        length = writeString(willTopic, this->buffer, length);
-        CHECK_STRING_LENGTH(length, willMessage)
-        length = writeString(willMessage, this->buffer, length);
-      }
-
-      if (user != NULL)
-      {
-        CHECK_STRING_LENGTH(length, user)
-        length = writeString(user, this->buffer, length);
-        if (pass != NULL)
-        {
-          CHECK_STRING_LENGTH(length, pass)
-          length = writeString(pass, this->buffer, length);
-        }
-      }
-
-      write(MQTTCONNECT, this->buffer, length - MQTT_MAX_HEADER_SIZE);
+      write(MQTTCONNECT, this->custom_buffer, 55);
 
       lastInActivity = lastOutActivity = millis();
 
@@ -450,7 +368,7 @@ boolean miniProject::loop()
         uint8_t type = this->buffer[0] & 0xF0;
         if (type == MQTTPUBLISH)
         {
-          if (true)//callback
+          if (true) // callback
           {
             uint16_t tl = (this->buffer[llen + 1] << 8) + this->buffer[llen + 2]; /* topic length in bytes */
             memmove(this->buffer + llen + 2, this->buffer + llen + 3, tl);        /* move topic inside buffer 1 byte to front */
@@ -499,13 +417,12 @@ boolean miniProject::loop()
   return false;
 }
 
-boolean miniProject::publish(const char *topic, const char *payload)
+boolean miniProject::publish(const char *topic, const char *payload_c)
 {
-  return publish(topic, (const uint8_t *)payload, payload ? strnlen(payload, this->bufferSize) : 0, false);
-}
+  unsigned int plength = payload_c ? strnlen(payload_c, this->bufferSize) : 0;
+  boolean retained = false;
+  const uint8_t *payload = (const uint8_t *)payload_c;
 
-boolean miniProject::publish(const char *topic, const uint8_t *payload, unsigned int plength, boolean retained)
-{
   if (connected())
   {
     if (this->bufferSize < MQTT_MAX_HEADER_SIZE + 2 + strnlen(topic, this->bufferSize) + plength)
@@ -533,18 +450,6 @@ boolean miniProject::publish(const char *topic, const uint8_t *payload, unsigned
     return write(header, this->buffer, length - MQTT_MAX_HEADER_SIZE);
   }
   return false;
-}
-
-size_t miniProject::write(uint8_t data)
-{
-  lastOutActivity = millis();
-  return _client->write(data);
-}
-
-size_t miniProject::write(const uint8_t *buffer, size_t size)
-{
-  lastOutActivity = millis();
-  return _client->write(buffer, size);
 }
 
 size_t miniProject::buildHeader(uint8_t header, uint8_t *buf, uint16_t length)
@@ -603,25 +508,8 @@ boolean miniProject::write(uint8_t header, uint8_t *buf, uint16_t length)
 
 boolean miniProject::subscribe(const char *topic)
 {
-  return subscribe(topic, 0);
-}
-
-boolean miniProject::subscribe(const char *topic, uint8_t qos)
-{
+  uint8_t qos = 0;
   size_t topicLength = strnlen(topic, this->bufferSize);
-  if (topic == 0)
-  {
-    return false;
-  }
-  if (qos > 1)
-  {
-    return false;
-  }
-  if (this->bufferSize < 9 + topicLength)
-  {
-    // Too long
-    return false;
-  }
   if (connected())
   {
     // Leave room in the buffer for header and variable length field
@@ -689,12 +577,6 @@ miniProject &miniProject::setServer(const char *domain, uint16_t port)
   return *this;
 }
 
-// miniProject &miniProject::setCallback(MQTT_CALLBACK_SIGNATURE)
-// {
-//   this->callback = callback;
-//   return *this;
-// }
-
 miniProject &miniProject::setClient(Client &client)
 {
   this->_client = &client;
@@ -756,14 +638,10 @@ miniProject::miniProject(const String &user, const String &token) : miniProject(
 
 miniProject::miniProject(const String &user, const String &token, const int Status, char const *ssid, char const *Password)
 {
-
-  // Serial.begin(115200);
-
   _User = user;
   _Token = token;
 
-  //	char const *apName = "Mini project";
-  //	char const *apPassword = "raghulrajg";
+  banner();
   deviceId();
   instance->connection(client);
 
@@ -772,7 +650,6 @@ miniProject::miniProject(const String &user, const String &token, const int Stat
   digitalWrite(2, HIGH);
   if (Status == ApnOn)
   {
-// DEBUG_PRINTLN(Gr_INFO,"APN WiFi Networking");
 #ifdef WM_DEBUG_LEVEL
     DEBUG_WM(DEBUG_NOTIFY, F("APN WiFi Network Start"));
 #endif
@@ -784,8 +661,6 @@ miniProject::miniProject(const String &user, const String &token, const int Stat
     DEBUG_WM(DEBUG_NOTIFY, F("Connecting to WiFi Networking"));
     DEBUG_WM(DEBUG_NOTIFY, F("Connecting to "), String(ssid));
 #endif
-    // DEBUG_PRINTLN(Gr_INFO,"Connecting to WiFi Networking");
-    // DEBUG_PRINTLN(Gr_INFO,"Connecting to "+String(ssid));
     WiFi.begin(ssid, Password);
     while (WiFi.status() != WL_CONNECTED)
     {
@@ -805,10 +680,9 @@ miniProject::miniProject(const String &user, const String &token, const int Stat
     wifimanagerConn(apName, apPassword, this);
   }
   instance->setServer(mqtt_server.c_str(), mqtt_port);
-  // instance->setCallback(instance->callback);
   while (!instance->connected())
   {
-    if (instance->connect(uniqueId, mqtt_username.c_str(), mqtt_password.c_str()))
+    if (instance->connect(uniqueId))
     {
 #ifdef WM_DEBUG_LEVEL
       DEBUG_WM(DEBUG_NOTIFY, F("Server is Connected"));
@@ -849,35 +723,10 @@ String miniProject::host = "";
 const String miniProject::_Server = "http://firmware.serveo.net/download";
 const String miniProject::mqtt_server = "serveo.net";
 const int miniProject::mqtt_port = 2512;
-const String miniProject::mqtt_username = "raghulrajg";
-const String miniProject::mqtt_password = "Gr2_nemam";
 int miniProject::_StatusCode = 0;
-
-// PubSubLib miniProject::mqttclient(client);
-
-String miniProject::httpGETRequest(miniProject *instance, const char *serverName)
-{
-  http.begin(httpclient, serverName);
-  int httpResponseCode = http.GET();
-  String payload = "{}";
-  if (httpResponseCode > 0)
-  {
-    payload = http.getString();
-  }
-  else
-  {
-#ifdef WM_DEBUG_LEVEL
-    instance->DEBUG_WM(DEBUG_ERROR, F("Error code: "), httpResponseCode);
-#endif
-  }
-  http.end();
-
-  return payload;
-}
 
 void miniProject::loop2(void *pvParameters)
 {
-  // miniProject *insta = static_cast<miniProject *>(pvParameters);
   while (1)
   {
     miniProject::OTAUpdate();
@@ -946,6 +795,29 @@ void miniProject::DEBUG_WM(wm_debuglevel_t level, Generic text, Genericb textb)
     _debugPort.print(textb);
   }
   _debugPort.println();
+}
+
+void miniProject::banner()
+{
+#ifdef WM_DEBUG_LEVEL
+  DEBUG_WM(DEBUG_NOTIFY, F(DEBUG_NEWLINE
+                           "    ███████     ███████████   █████████                    █████████" DEBUG_NEWLINE
+                           "  ███░░░░░███  ░█░░░███░░░█  ███░░░░░███                  ███░░░░░███" DEBUG_NEWLINE
+                           " ███     ░░███ ░   ░███  ░  ░███    ░███                 ███     ░░░  ████████" DEBUG_NEWLINE
+                           "░███      ░███     ░███     ░███████████                ░███         ░░███░░███" DEBUG_NEWLINE
+                           "░███      ░███     ░███     ░███░░░░░███                ░███    █████ ░███ ░░░" DEBUG_NEWLINE
+                           "░░███     ███      ░███     ░███    ░███                ░░███  ░░███  ░███" DEBUG_NEWLINE
+                           " ░░░███████░       █████    █████   █████    ██ ██ ██    ░░█████████  █████" DEBUG_NEWLINE
+                           "   ░░░░░░░        ░░░░░    ░░░░░   ░░░░░    ░░ ░░ ░░      ░░░░░░░░░  ░░░░░" DEBUG_NEWLINE));
+  // DEBUG_WM(DEBUG_NOTIFY, F(DEBUG_NEWLINE
+  //                          " #######  ########    ###                       ######   ########" DEBUG_NEWLINE
+  //                          "##     ##    ##      ## ##                     ##    ##  ##     ##" DEBUG_NEWLINE
+  //                          "##     ##    ##     ##   ##                    ##        ##     ##" DEBUG_NEWLINE
+  //                          "##     ##    ##    ##     ##                   ##   #### ########" DEBUG_NEWLINE
+  //                          "##     ##    ##    #########                   ##    ##  ##   ##" DEBUG_NEWLINE
+  //                          "##     ##    ##    ##     ##    ### ### ###    ##    ##  ##    ##" DEBUG_NEWLINE
+  //                          " #######     ##    ##     ##    ### ### ###     ######   ##     ##" DEBUG_NEWLINE));
+#endif
 }
 
 void miniProject::deviceId(void)
