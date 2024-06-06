@@ -7,8 +7,8 @@ const String& User = "YOUR_USER_ID";
 const String& Token = "YOUR_TOKEN";
 
 //Put Your Wifi Name and Password
-char const *SSID = "Mini project";
-char const *Password = "raghulrajg";
+char const *SSID = "YOUR_SSID";
+char const *Password = "YOUR_PASSWORD";
 
 // put your variable here:
 

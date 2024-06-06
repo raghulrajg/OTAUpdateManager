@@ -7,8 +7,8 @@ const String& User = "YOUR_USER_ID";
 const String& Token = "YOUR_TOKEN";
 
 // put your variable here:
-char const *apName = "Mini project";
-char const *apPassword = "raghulrajg";
+char const *apName = "YOUR_APN_NAME";
+char const *apPassword = "YOUR_APN_PASSWORD";
 
 void setup() {
   Serial.begin(115200);
