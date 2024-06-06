@@ -1,6 +1,8 @@
 # OTAUpdateManager
 Implementation of OTA for remote monitoring and control of IoT devices
 
+[![arduino-library-badge](https://www.ardu-badge.com/badge/OTAUpdateManager.svg?)](https://www.ardu-badge.com/OTAUpdateManager)
+
 [![ESP8266](https://img.shields.io/badge/ESP-8266-000000.svg?longCache=true&style=flat&colorA=CC101F)](https://www.espressif.com/en/products/socs/esp8266)
 
 [![ESP32](https://img.shields.io/badge/ESP-32-000000.svg?longCache=true&style=flat&colorA=CC101F)](https://www.espressif.com/en/products/socs/esp32)
