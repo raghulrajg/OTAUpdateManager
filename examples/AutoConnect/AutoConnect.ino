@@ -10,7 +10,7 @@ const String& Token = "YOUR_TOKEN";
 
 void setup() {
   Serial.begin(115200);
-  miniProject(User, Token); //turn on the wifi connected to miniProject and password raghulrajg
+  miniProject(User, Token); //turn on the wifi connected to miniProject and password is raghulrajg
   // put your setup code here, to run once:
 
 } 
