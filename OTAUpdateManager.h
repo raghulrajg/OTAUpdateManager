@@ -1,5 +1,5 @@
-#ifndef miniProject_h
-#define miniProject_h
+#ifndef OTAUpdateManager_h
+#define OTAUpdateManager_h
 
 #include <WiFiManager.h>
 #include <Arduino.h>
@@ -45,7 +45,7 @@ void update_progress(int cur, int total);
 void update_error(int err);
 void callback(char *topic, byte *payload, unsigned int length);
 
-class miniProject
+class OTAUpdateManager
 {
 private:
 	// variable
@@ -87,22 +87,22 @@ private:
 public:
 	// functions
 	void banner();
-	miniProject();
-	miniProject(const String &user, const String &token);
-	miniProject(const String &user, const String &token, const int Status, char const *ssid, char const *Password);
+	OTAUpdateManager();
+	OTAUpdateManager(const String &user, const String &token);
+	OTAUpdateManager(const String &user, const String &token, const int Status, char const *ssid, char const *Password);
 
-	~miniProject();
+	~OTAUpdateManager();
 
-	static void wifimanagerConn(char const *apName, char const *apPassword, miniProject *instance);
+	static void wifimanagerConn(char const *apName, char const *apPassword, OTAUpdateManager *instance);
 	void deviceId(void);
 	void Alive(int cur, int total);
 	friend void callback(char *topic, byte *payload, unsigned int length);
 
 	void connection(Client &client);
-	miniProject &setServer(const char *domain, uint16_t port);
-	miniProject &setClient(Client &client);
-	miniProject &setKeepAlive(uint16_t keepAlive);
-	miniProject &setSocketTimeout(uint16_t timeout);
+	OTAUpdateManager &setServer(const char *domain, uint16_t port);
+	OTAUpdateManager &setClient(Client &client);
+	OTAUpdateManager &setKeepAlive(uint16_t keepAlive);
+	OTAUpdateManager &setSocketTimeout(uint16_t timeout);
 
 	boolean setBufferSize(uint16_t size);
 	boolean connect(const char *id);

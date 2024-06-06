@@ -1,18 +1,21 @@
-#include <miniProject.h>
+#include <OTAUpdateManager.h>
 
 //Avoid the GPIO pin number 2 because of predefine pin
 //create your User ID and Token in https://ota.serveo.net/
- 
+
+//server connection config
 const String& User = "YOUR_USER_ID";
 const String& Token = "YOUR_TOKEN";
 
-// put your variable here:
+//Network connection config
 char const *apName = "YOUR_APN_NAME";
 char const *apPassword = "YOUR_APN_PASSWORD";
 
+// put your variable here:
+
 void setup() {
   Serial.begin(115200);
-  miniProject(User, Token, ApnOn, apName, apPassword);
+  OTAUpdateManager(User, Token, ApnOn, apName, apPassword);
   // put your setup code here, to run once:
 
 } 

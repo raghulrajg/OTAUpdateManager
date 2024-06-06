@@ -1,12 +1,12 @@
 #######################################
-# Syntax Coloring Map For miniProject
+# Syntax Coloring Map For OTAUpdateManager
 #######################################
 
 #######################################
 # Datatypes (KEYWORD1)
 #######################################
 
-miniProject	KEYWORD1
+OTAUpdateManager    KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)

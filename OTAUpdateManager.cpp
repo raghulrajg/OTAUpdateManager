@@ -1,7 +1,7 @@
-#include "miniProject.h"
+#include "OTAUpdateManager.h"
 
 WiFiClient client;
-miniProject *instance = new miniProject;
+OTAUpdateManager *instance = new OTAUpdateManager;
 static TaskHandle_t _arduino_event_task_handle = NULL;
 
 void update_started()
@@ -49,10 +49,10 @@ void callback(char *topic, byte *payload, unsigned int length)
     instance->DEBUG_WM(F("parsing failed: "), error.c_str());
 #endif
   }
-  miniProject::_StatusCode = doc["status"];
+  OTAUpdateManager::_StatusCode = doc["status"];
 }
 
-void miniProject::Alive(int cur = 0, int total = 0)
+void OTAUpdateManager::Alive(int cur = 0, int total = 0)
 {
   StaticJsonDocument<256> doc;
   doc["deviceID"] = String(uniqueId);
@@ -74,7 +74,7 @@ void miniProject::Alive(int cur = 0, int total = 0)
   instance->loop();
 }
 
-void miniProject::wifimanagerConn(char const *apName, char const *apPassword, miniProject *instance)
+void OTAUpdateManager::wifimanagerConn(char const *apName, char const *apPassword, OTAUpdateManager *instance)
 {
   WiFiManager wm;
   bool res;
@@ -96,7 +96,7 @@ void miniProject::wifimanagerConn(char const *apName, char const *apPassword, mi
   }
 }
 
-void miniProject::OTAUpdate()
+void OTAUpdateManager::OTAUpdate()
 {
   WiFiClient client1;
 
@@ -152,7 +152,7 @@ void miniProject::OTAUpdate()
   }
 }
 
-void miniProject::connection(Client &client)
+void OTAUpdateManager::connection(Client &client)
 {
   this->_state = MQTT_DISCONNECTED;
   setClient(client);
@@ -163,7 +163,7 @@ void miniProject::connection(Client &client)
   setSocketTimeout(MQTT_SOCKET_TIMEOUT);
 }
 
-boolean miniProject::connect(const char *id)
+boolean OTAUpdateManager::connect(const char *id)
 {
   if (!connected())
   {
@@ -231,7 +231,7 @@ boolean miniProject::connect(const char *id)
 }
 
 // reads a byte into result
-boolean miniProject::readByte(uint8_t *result)
+boolean OTAUpdateManager::readByte(uint8_t *result)
 {
   uint32_t previousMillis = millis();
   while (!_client->available())
@@ -248,7 +248,7 @@ boolean miniProject::readByte(uint8_t *result)
 }
 
 // reads a byte into result[*index] and increments index
-boolean miniProject::readByte(uint8_t *result, uint16_t *index)
+boolean OTAUpdateManager::readByte(uint8_t *result, uint16_t *index)
 {
   uint16_t current_index = *index;
   uint8_t *write_address = &(result[current_index]);
@@ -260,7 +260,7 @@ boolean miniProject::readByte(uint8_t *result, uint16_t *index)
   return false;
 }
 
-uint32_t miniProject::readPacket(uint8_t *lengthLength)
+uint32_t OTAUpdateManager::readPacket(uint8_t *lengthLength)
 {
   uint16_t len = 0;
   if (!readByte(this->buffer, &len))
@@ -333,7 +333,7 @@ uint32_t miniProject::readPacket(uint8_t *lengthLength)
   return len;
 }
 
-boolean miniProject::loop()
+boolean OTAUpdateManager::loop()
 {
   if (connected())
   {
@@ -417,7 +417,7 @@ boolean miniProject::loop()
   return false;
 }
 
-boolean miniProject::publish(const char *topic, const char *payload_c)
+boolean OTAUpdateManager::publish(const char *topic, const char *payload_c)
 {
   unsigned int plength = payload_c ? strnlen(payload_c, this->bufferSize) : 0;
   boolean retained = false;
@@ -452,7 +452,7 @@ boolean miniProject::publish(const char *topic, const char *payload_c)
   return false;
 }
 
-size_t miniProject::buildHeader(uint8_t header, uint8_t *buf, uint16_t length)
+size_t OTAUpdateManager::buildHeader(uint8_t header, uint8_t *buf, uint16_t length)
 {
   uint8_t lenBuf[4];
   uint8_t llen = 0;
@@ -480,7 +480,7 @@ size_t miniProject::buildHeader(uint8_t header, uint8_t *buf, uint16_t length)
   return llen + 1; // Full header size is variable length bit plus the 1-byte fixed header
 }
 
-boolean miniProject::write(uint8_t header, uint8_t *buf, uint16_t length)
+boolean OTAUpdateManager::write(uint8_t header, uint8_t *buf, uint16_t length)
 {
   uint16_t rc;
   uint8_t hlen = buildHeader(header, buf, length);
@@ -506,7 +506,7 @@ boolean miniProject::write(uint8_t header, uint8_t *buf, uint16_t length)
 #endif
 }
 
-boolean miniProject::subscribe(const char *topic)
+boolean OTAUpdateManager::subscribe(const char *topic)
 {
   uint8_t qos = 0;
   size_t topicLength = strnlen(topic, this->bufferSize);
@@ -528,7 +528,7 @@ boolean miniProject::subscribe(const char *topic)
   return false;
 }
 
-uint16_t miniProject::writeString(const char *string, uint8_t *buf, uint16_t pos)
+uint16_t OTAUpdateManager::writeString(const char *string, uint8_t *buf, uint16_t pos)
 {
   const char *idp = string;
   uint16_t i = 0;
@@ -543,7 +543,7 @@ uint16_t miniProject::writeString(const char *string, uint8_t *buf, uint16_t pos
   return pos;
 }
 
-boolean miniProject::connected()
+boolean OTAUpdateManager::connected()
 {
   boolean rc;
   if (_client == NULL)
@@ -570,25 +570,25 @@ boolean miniProject::connected()
   return rc;
 }
 
-miniProject &miniProject::setServer(const char *domain, uint16_t port)
+OTAUpdateManager &OTAUpdateManager::setServer(const char *domain, uint16_t port)
 {
   this->domain = domain;
   this->port = port;
   return *this;
 }
 
-miniProject &miniProject::setClient(Client &client)
+OTAUpdateManager &OTAUpdateManager::setClient(Client &client)
 {
   this->_client = &client;
   return *this;
 }
 
-int miniProject::state()
+int OTAUpdateManager::state()
 {
   return this->_state;
 }
 
-boolean miniProject::setBufferSize(uint16_t size)
+boolean OTAUpdateManager::setBufferSize(uint16_t size)
 {
   if (size == 0)
   {
@@ -615,28 +615,28 @@ boolean miniProject::setBufferSize(uint16_t size)
   return (this->buffer != NULL);
 }
 
-miniProject &miniProject::setKeepAlive(uint16_t keepAlive)
+OTAUpdateManager &OTAUpdateManager::setKeepAlive(uint16_t keepAlive)
 {
   this->keepAlive = keepAlive;
   return *this;
 }
-miniProject &miniProject::setSocketTimeout(uint16_t timeout)
+OTAUpdateManager &OTAUpdateManager::setSocketTimeout(uint16_t timeout)
 {
   this->socketTimeout = timeout;
   return *this;
 }
 
 // constructor
-miniProject::miniProject()
+OTAUpdateManager::OTAUpdateManager()
 {
   return;
 }
-miniProject::miniProject(const String &user, const String &token) : miniProject(user, token, ApnOn, "Mini project", "raghulrajg")
+OTAUpdateManager::OTAUpdateManager(const String &user, const String &token) : OTAUpdateManager(user, token, ApnOn, "Mini project", "raghulrajg")
 {
   return;
 }
 
-miniProject::miniProject(const String &user, const String &token, const int Status, char const *ssid, char const *Password)
+OTAUpdateManager::OTAUpdateManager(const String &user, const String &token, const int Status, char const *ssid, char const *Password)
 {
   _User = user;
   _Token = token;
@@ -701,7 +701,7 @@ miniProject::miniProject(const String &user, const String &token, const int Stat
   instance->subscribe(topic.c_str());
 
   xTaskCreateUniversal(
-      miniProject::loop,
+      OTAUpdateManager::loop,
       "loop2",
       8000,
       NULL,
@@ -710,52 +710,52 @@ miniProject::miniProject(const String &user, const String &token, const int Stat
       ARDUINO_EVENT_RUNNING_CORE);
 }
 
-miniProject::~miniProject()
+OTAUpdateManager::~OTAUpdateManager()
 {
   free(this->buffer);
 }
 
-char miniProject::uniqueId[24] = "";
-String miniProject::jsonBuffer = "";
-String miniProject::_User = "";
-String miniProject::_Token = "";
-String miniProject::host = "";
-const String miniProject::_Server = "http://firmware.serveo.net/download";
-const String miniProject::mqtt_server = "serveo.net";
-const int miniProject::mqtt_port = 2512;
-int miniProject::_StatusCode = 0;
+char OTAUpdateManager::uniqueId[24] = "";
+String OTAUpdateManager::jsonBuffer = "";
+String OTAUpdateManager::_User = "";
+String OTAUpdateManager::_Token = "";
+String OTAUpdateManager::host = "";
+const String OTAUpdateManager::_Server = "http://firmware.serveo.net/download";
+const String OTAUpdateManager::mqtt_server = "serveo.net";
+const int OTAUpdateManager::mqtt_port = 2512;
+int OTAUpdateManager::_StatusCode = 0;
 
-void miniProject::loop(void *pvParameters)
+void OTAUpdateManager::loop(void *pvParameters)
 {
   while (1)
   {
-    miniProject::OTAUpdate();
+    OTAUpdateManager::OTAUpdate();
   }
 }
 
 // DEBUG
 // @todo fix DEBUG_WM(0,0);
 template <typename Generic>
-void miniProject::DEBUG_WM(Generic text)
+void OTAUpdateManager::DEBUG_WM(Generic text)
 {
   DEBUG_WM(DEBUG_NOTIFY, text, "");
 }
 
 template <typename Generic>
-void miniProject::DEBUG_WM(wm_debuglevel_t level, Generic text)
+void OTAUpdateManager::DEBUG_WM(wm_debuglevel_t level, Generic text)
 {
   if (_debugLevel >= level)
     DEBUG_WM(level, text, "");
 }
 
 template <typename Generic, typename Genericb>
-void miniProject::DEBUG_WM(Generic text, Genericb textb)
+void OTAUpdateManager::DEBUG_WM(Generic text, Genericb textb)
 {
   DEBUG_WM(DEBUG_NOTIFY, text, textb);
 }
 
 template <typename Generic, typename Genericb>
-void miniProject::DEBUG_WM(wm_debuglevel_t level, Generic text, Genericb textb)
+void OTAUpdateManager::DEBUG_WM(wm_debuglevel_t level, Generic text, Genericb textb)
 {
   if (!_debug || _debugLevel < level)
     return;
@@ -797,7 +797,7 @@ void miniProject::DEBUG_WM(wm_debuglevel_t level, Generic text, Genericb textb)
   _debugPort.println();
 }
 
-void miniProject::banner()
+void OTAUpdateManager::banner()
 {
 #ifdef WM_DEBUG_LEVEL
   DEBUG_WM(DEBUG_NOTIFY, F(DEBUG_NEWLINE
@@ -820,7 +820,7 @@ void miniProject::banner()
 #endif
 }
 
-void miniProject::deviceId(void)
+void OTAUpdateManager::deviceId(void)
 {
   uint8_t mac[6];
   esp_read_mac(mac, ESP_MAC_WIFI_STA);

@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 1.0)
 
 idf_component_register(
-                       SRCS "miniProject.cpp"
+                       SRCS "OTAUpdateManager.cpp"
                        INCLUDE_DIRS "."
                        PRIV_REQUIRES arduino
 )
 
-project(miniProject)
+project(OTAUpdateManager)
