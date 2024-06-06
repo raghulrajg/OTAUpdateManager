@@ -1,7 +1,6 @@
 #ifndef miniProject_h
 #define miniProject_h
 
-#include "stringen.h"
 #include <WiFiManager.h>
 #include <Arduino.h>
 #include <HTTPClient.h>
