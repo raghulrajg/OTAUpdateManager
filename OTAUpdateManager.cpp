@@ -1,9 +1,9 @@
 /**
  * OTAUpdateManager.cpp
- * 
+ *
  * OTAUpdateManager, a library for the ESP8266/Arduino platform
  * for managing Over-The-Air updates for IoT devices
- * 
+ *
  * @author Creator Raghul Raj G
  * @version 1.0-gr2.1
  * @license GNU v3.0
@@ -196,10 +196,29 @@ boolean OTAUpdateManager::connect(const char *id)
     {
       nextMsgId = 1;
 
-      uint8_t values[] = {126, 158, 114, 16, 55, 0, 4, 77, 81, 84, 84, 4, 194, 0, 15, 0, 20, 66, 48, 51, 56, 51, 68, 67, 52, 70, 53, 70, 67, 70, 67, 70, 53, 67, 52, 51, 68, 0, 10, 114, 97, 103, 104, 117, 108, 114, 97, 106, 103, 0, 9, 71, 114, 50, 95, 110, 101, 109, 97, 109};
-      custom_buffer = values;
+      uint8_t stbuf[] = {126, 158, 114, 16, 55, 0, 4, 77, 81, 84, 84, 4, 194, 0, 15, 0, 20};
+      int stbufsz = sizeof(stbuf) / sizeof(stbuf[0]);
+      uint8_t enbuf[] = {0, 10, 114, 97, 103, 104, 117, 108, 114, 97, 106, 103, 0, 9, 71, 114, 50, 95, 110, 101, 109, 97, 109};
+      int enbufsz = sizeof(enbuf) / sizeof(enbuf[0]);
+      uint8_t *custombuffer = (uint8_t *)malloc(60 * sizeof(uint8_t));
+      if (custombuffer == NULL)
+      {
+        Serial.println("Memory allocation failed\n");
+        return 1;
+      }
+      memcpy(custombuffer, stbuf, stbufsz);
+      int uniqueIdLength = strlen(uniqueId);
 
-      write(MQTTCONNECT, this->custom_buffer, 55);
+      for (int i = 0; i < uniqueIdLength; i++)
+      {
+        custombuffer[stbufsz + i] = uniqueId[i];
+      }
+      for (int i = 0; i < enbufsz; i++)
+      {
+        custombuffer[stbufsz + uniqueIdLength + i] = enbuf[i];
+      }
+
+      write(MQTTCONNECT, custombuffer, 55);
 
       lastInActivity = lastOutActivity = millis();
 

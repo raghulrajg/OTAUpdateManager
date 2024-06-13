@@ -43,6 +43,8 @@
 
 #define MQTT_MAX_HEADER_SIZE 5
 
+#define CHECK_STRING_LENGTH(l,s) if (l+2+strnlen(s, this->bufferSize) > this->bufferSize) {_client->stop();return false;}
+
 #define No_Update 0
 #define Update 1
 #define user_token_invalid -1
