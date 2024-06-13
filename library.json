@@ -1,8 +1,8 @@
 {
   "name": "OTAUpdateManager",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "keywords": "wifi,wi-fi,esp,esp8266,esp32,espressif8266,espressif32,nodemcu,wemos,arduino,ota,update",
-  "description": "Implementation of OTA for remote monitoring and control in IoT device",
+  "description": "Implementation of OTA for remote monitoring and control in IoT devices",
   "authors":
   [
     {
