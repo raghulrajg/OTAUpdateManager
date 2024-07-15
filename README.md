@@ -5,6 +5,8 @@ Implementation of OTA for remote monitoring and control of IoT devices
 
 [![Manage PRs](https://github.com/arduino/library-registry/actions/workflows/manage-prs.yml/badge.svg?branch=dependabot%2Fgithub_actions%2Factions%2Fdownload-artifact-4)](https://github.com/arduino/library-registry/actions/workflows/manage-prs.yml)
 
+[![PlatformIO Registry](https://badges.registry.platformio.org/packages/raghulrajg/library/OTAUpdateManager.svg)](https://registry.platformio.org/libraries/raghulrajg/OTAUpdateManager)
+
 [![ESP8266](https://img.shields.io/badge/ESP-8266-000000.svg?longCache=true&style=flat&colorA=CC101F)](https://www.espressif.com/en/products/socs/esp8266)
 
 [![ESP32](https://img.shields.io/badge/ESP-32-000000.svg?longCache=true&style=flat&colorA=CC101F)](https://www.espressif.com/en/products/socs/esp32)
